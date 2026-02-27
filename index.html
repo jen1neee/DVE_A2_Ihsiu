@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galaxy Smart Feeder Pro</title>
+  
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Helvetica Neue', sans-serif; background: #ffffff; color: #111; height: 100vh; display: flex; flex-direction: column; }
+    header { padding: 20px 60px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 20px; font-weight: 600; }
+    
+    .viewer-section { 
+      position: relative; 
+      flex-grow: 1; /* Ensures it fills available space */
+      width: 95%; 
+      margin: 10px auto 30px auto; 
+      background: #f7f7f7; 
+      border-radius: 30px; 
+      overflow: hidden; 
+      box-shadow: 0 40px 100px rgba(0,0,0,0.08); 
+    }
+    
+    model-viewer { width: 100%; height: 100%; display: block; }
+
+    /* UI Overlay */
+    .controls-overlay { position: absolute; bottom: 25px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; pointer-events: none; z-index: 10; }
+    .panel { background: rgba(255,255,255,0.75); backdrop-filter: blur(15px); padding: 18px; border-radius: 24px; pointer-events: auto; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .row { display: flex; gap: 8px; align-items: center; }
+    .label { font-size: 10px; font-weight: 900; color: #777; text-transform: uppercase; width: 95px; }
+    button { padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
+    button:hover { background: #000; color: #fff; border-color: #000; }
+    .btn-pause { color: #d00; border-color: #fcc; }
+    .btn-resume { color: #008000; border-color: #cfc; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>SAMSUNG</h1>
+  <button style="background:#000; color:#fff; border-radius:25px; padding: 10px 20px;">Buy Now</button>
+</header>
+
+<section class="viewer-section">
+  <model-viewer id="gear" src="model.glb" ar camera-controls camera-orbit="0deg 90deg 2.8m" shadow-intensity="1" alt="A 3D model of a Galaxy Smart Feeder">
+    
+    <div class="controls-overlay">
+      <div class="panel">
+        <div class="row">
+          <span class="label">Style</span>
+          <button onclick="setVar('black and silver')">Black & Silver</button>
+          <button onclick="setVar('brass and copper')">Brass & Copper</button>
+          <button onclick="setVar('grey and black')">Grey & Black</button>
+        </div>
+        <div class="row">
+          <span class="label">Animate</span>
+          <button onclick="smartPlay('bowl')">Mouse Bowl</button>
+          <button onclick="smartPlay('treat')">Treat Container</button>
+          <button onclick="smartPlay('slider')">Slider</button>
+        </div>
+        <div class="row">
+          <span class="label">Playback</span>
+          <button class="btn-pause" onclick="pauseAnim()">Pause</button>
+          <button class="btn-resume" onclick="resumeAnim()">Resume</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <span class="label">Viewpoint</span>
+        <button onclick="setOrbit('0deg 90deg 2.8m')">Front</button> 
+        <button onclick="setOrbit('0deg 0deg 2.8m')">Top</button>   
+        <button onclick="setOrbit('-90deg 90deg 2.8m')">Left</button>
+        <button onclick="setOrbit('90deg 90deg 2.8m')">Right</button>
+      </div>
+    </div>
+  </model-viewer>
+</section>
+
+<script>
+  // Wait for the window to load to prevent blank screen issues
+  window.addEventListener('load', () => {
+    const mv = document.getElementById('gear');
+
+    window.setOrbit = (orb) => { mv.cameraOrbit = orb; };
+    window.pauseAnim = () => { mv.pause(); };
+    window.resumeAnim = () => { mv.play(); };
+
+    window.smartPlay = (keyword) => {
+      mv.pause();
+      const found = mv.availableAnimations.find(a => a.toLowerCase().includes(keyword.toLowerCase()));
+      if (found) {
+        mv.animationName = found;
+        mv.play({ repetitions: 1 });
+      } else {
+        console.error("No animation found containing: " + keyword);
+      }
+    };
+
+    window.setVar = (name) => {
+      const target = mv.availableVariants.find(v => v.toLowerCase().replace(/\s/g, '') === name.toLowerCase().replace(/\s/g, ''));
+      if (target) { mv.variantName = target; }
+    };
+
+    mv.addEventListener('error', (event) => {
+      console.error("Model failed to load. Check your file path!", event);
+    });
+  });
+</script>
+</body>
+</html>
